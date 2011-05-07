@@ -1,0 +1,9 @@
+# Ficheros que git debe ignorar
+
+conf/70-local.rules
+doc/
+.*.swp
+*~
+*.pyc
+*.hex
+
