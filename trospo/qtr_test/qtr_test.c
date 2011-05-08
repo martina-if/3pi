@@ -59,10 +59,6 @@ int main()
 	// int qtr_analog_pins[] = {0, 1, 2};
 	// qtr_analog_init(qtr_analog_pins, 3, 10, IO_C0); // 10 samples, emitter pin is PC0
 
-	// optional: wait for some input from the user, such as  a button press
-
-	// El BUTTON_A, según el esquemático de 3pi, es el PB_1.
-	
 	beep(200);
 	serial_send_blocking("Press Button A to start calibrating...\n", 39);
 	wait_for_button_press(BUTTON_A);

@@ -49,6 +49,8 @@ while True:
 	###############################################################################
 			print str(theint[0]),
 		print
+	else:
+		print "Tiro byte! (%b)" % sync_byte
 
 ser.close()
 
