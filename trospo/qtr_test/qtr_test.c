@@ -52,8 +52,10 @@ int main()
 	serial_receive_ring(buffer, 100);
 
 	// initialize your QTR sensors
-	//  unsigned char qtr_rc_pins[] = {IO_C0, IO_C1, IO_C2};
-	unsigned char qtr_rc_pins[] = {IO_C0, IO_C1, IO_C2, IO_C3, IO_C4, IO_C5, IO_D7, IO_D4};
+	// With this configuration, sensors[i] = value from sensor (i+1) (sensor array numbering)
+	// unsigned char qtr_rc_pins[] = {IO_C0, IO_C1, IO_C2, IO_C3, IO_C4, IO_C5, IO_D7, IO_D4};
+	// With this configuration, sensors are 0,1,...,7, ordered from left to right.
+	unsigned char qtr_rc_pins[] = {IO_D4, IO_D7, IO_C5, IO_C4, IO_C3, IO_C2, IO_C1, IO_C0};
 	qtr_rc_init(qtr_rc_pins, 8, 2000, IO_D2);  // 800 us timeout, emitter pin PD2
 //	qtr_rc_init(qtr_rc_pins, 6, 2000, 255);  // 800 us timeout, no emitter pin 
 	// int qtr_analog_pins[] = {0, 1, 2};

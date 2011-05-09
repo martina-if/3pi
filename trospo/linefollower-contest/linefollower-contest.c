@@ -36,6 +36,7 @@ void initialize()
 	qtr_rc_init(qtr_rc_pins, 8, 2000, IO_D2);  // 800 us timeout, emitter pin PD2
 
 
+	while(is_playing());
 	serial_send_blocking("Press Button A to start calibrating...\n", 39);
 	wait_for_button_press(BUTTON_A);
 	// Always wait for the button to be released so that the robot doesn't
@@ -85,7 +86,6 @@ int main()
 	{
 		// FIRST MAIN LOOP BODY  
 		follow_segment();
-		play(">>a32");
 
 		// Drive straight a bit.  This helps us in case we entered the
 		// intersection at an angle.
