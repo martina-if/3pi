@@ -45,9 +45,9 @@ while True:
 		proportional = struct.unpack("h", proportional)
 		proportional = proportional[0]
 		
-		integral = ser.read(2)							# long
-		integral = struct.unpack("h", integral)
-		integral = integral[0]
+#		integral = ser.read(2)							# long
+#		integral = struct.unpack("h", integral)
+#		integral = integral[0]
 
 		derivative = ser.read(2)						# int
 		derivative = struct.unpack("h", derivative)
@@ -58,7 +58,7 @@ while True:
 		power_diff = power_diff[0]
 
 		print "Position = %d" % position
-		print "Power diff %d= %d/20 + %d/10000 + %d*3/2" % (power_diff, proportional, integral, derivative)
+		print "Power diff %d= %d/20 + %d*3/2" % (power_diff, proportional, derivative)
 #		print "My power diff = %d" % int(proportional)/20 + int(integral)/10000 + int(derivative)*3/2
 
 		print
