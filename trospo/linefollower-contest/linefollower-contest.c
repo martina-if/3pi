@@ -78,6 +78,8 @@ void initialize()
 // This function is called once, from main.c.
 int main()
 {
+	int op;
+
 	// set up the 3pi
 	initialize();
 
@@ -85,7 +87,17 @@ int main()
 	while(1)
 	{
 		// FIRST MAIN LOOP BODY  
-		follow_segment();
+		op = follow_segment();
+
+		if (op == STOP)
+		{
+			set_motors(0,0);
+			break;
+		}
+		else if (op == LEFT || op == RIGHT || op == FORWARD)
+		{
+			follow_til_interesection(op);
+		}
 
 		// Drive straight a bit.  This helps us in case we entered the
 		// intersection at an angle.
