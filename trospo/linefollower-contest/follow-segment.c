@@ -80,7 +80,7 @@ char select_turn(int* tips, unsigned int tam, unsigned char found_left, unsigned
 int follow_segment()
 {
 	unsigned int sensors[8]; // an array to hold sensor values
-	unsigned int slow = 0;
+	unsigned int slow = 50;
 
 #ifdef PID
 	int last_proportional = 0;
@@ -96,17 +96,17 @@ int follow_segment()
 		unsigned int position = qtr_read_line(sensors,QTR_EMITTERS_ON);
 
 
-		// If I lift the robot, it should stop the motors. When the 
-		// sensors are no longer near a surface, they will all read 1000,
-		// and the position given by read_line functions will be 3500.
-		//if (sensors[0] + sensors[1] + sensors[2] + sensors[3] + sensors[4]
-		//		+ sensors[5] + sensors[6] + sensors[7] == 7000)
-		if (sensors[0] + sensors[1] + sensors[2] + sensors[3] + sensors[4] + 
-				sensors[5] + sensors[6] + sensors[7] == 7000)
-		{
-			set_motors(0,0);
-			return STOP;
-		}
+//		// If I lift the robot, it should stop the motors. When the 
+//		// sensors are no longer near a surface, they will all read 1000,
+//		// and the position given by read_line functions will be 3500.
+//		//if (sensors[0] + sensors[1] + sensors[2] + sensors[3] + sensors[4]
+//		//		+ sensors[5] + sensors[6] + sensors[7] == 7000)
+//		if (sensors[0] + sensors[1] + sensors[2] + sensors[3] + sensors[4] + 
+//				sensors[5] + sensors[6] + sensors[7] == 8000)
+//		{
+//			set_motors(0,0);
+//			return STOP;
+//		}
 
 		// Look for tips
 		if (sensors[3] > 700 && sensors[0]> 700 && (sensors[2] + sensors[1]) < 700)
@@ -254,7 +254,7 @@ int follow_segment()
 		else // (position < 7000)
 		{
 			// We are far to the left of the line: turn right.
-			set_motors(170 - slow, 0 - slow);
+			set_motors(170 - slow, 0);
 		}
 #endif
 		return CONTINUE;
@@ -330,35 +330,27 @@ void follow_til_interesection(int op)
 		if (sensors[1] + sensors[2] > 1200 || sensors[5] + sensors[6] > 1200)
 			break; // Found an intersection
 
-		else if(position < 2000)
+		else if (sensors[3] > 700 && sensors[4] > 700)
 		{
-			set_motors(0, 80);
+			set_motors(70,70);
 		}
-		else if (position < 3000)
+		else if (sensors[2] > 600 || sensors[1] > 600)
 		{
 			set_motors(40, 70);
 		}
-		else if (position < 3300) // CENTER = 3500
+		else if (sensors[0] > 700)
 		{
-			set_motors(60, 70);
+			set_motors(0, 70);
 		}
-		else if (position < 3700)
-		{
-			// We are somewhat close to being centered on the line:
-			// drive straight.
-			set_motors(70, 70);
-		}
-		else if (position < 4000)
-		{
-			set_motors(70, 60);
-		}
-		else if (position < 5000)
+		else if (sensors[5] > 600 || sensors[6] > 600)
 		{
 			set_motors(70, 40);
 		}
-		else
+		else if (sensors[7] > 700)
 		{
-			set_motors(80,0);
+			// We are somewhat close to being centered on the line:
+			// drive straight.
+			set_motors(70, 0);
 		}
 	}
 

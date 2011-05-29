@@ -11,7 +11,7 @@ LDFLAGS=-Wl,-gc-sections -lpololu_$(DEVICE) -Wl,-relax
 PORT ?= /dev/orangutan_programmer
 AVRDUDE=avrdude
 TARGET=linefollower-contest
-OBJECT_FILES=linefollower-contest.o follow-segment.o
+OBJECT_FILES=linefollower-contest.o follow-segment.o turn.o
 
 all: $(TARGET).hex
 

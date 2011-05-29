@@ -92,7 +92,7 @@ int main()
 		if (op == STOP)
 		{
 			set_motors(0,0);
-			break;
+			goto stop;
 		}
 		else if (op == LEFT || op == RIGHT || op == FORWARD)
 		{
@@ -107,6 +107,12 @@ int main()
 //		delay_ms(50);
 
 	}
+
+stop:
+
+	set_motors(0,0);
+	serial_send_blocking("STOP\n", 5);
+	while(1);
 
 	// This part of the code is never reached.  A robot should
 	// never reach the end of its program, or unpredictable behavior
