@@ -12,7 +12,7 @@ PORT ?= /dev/orangutan_programmer
 AVRDUDE=avrdude
 
 TARGET=test
-OBJECT_FILES=test.o
+OBJECT_FILES=test.o turn.o
 
 all: $(TARGET).hex
 

@@ -10,27 +10,31 @@
 // (straight), or 'B' (back).
 void turn(char dir, int angle)
 {
-   int time = (long)((float)(angle*MSPER90/9.0));
+//   int time = (long)((float)(angle*MSPER90/9.0));
+//	long time = angle*7;
+	unsigned int time = 490; // Calibrated for TROSPO!!
 
 	switch(dir)
 	{
 	case 'L':
 		// Turn left.
-		set_motors(-40,40);
+		set_motors(-60,60);
 		delay_ms(time);
 		break;
 	case 'R':
 		// Turn right.
-		set_motors(40,-40);
+		set_motors(60,-60);
 		delay_ms(time);
 		break;
 	case 'B':
 		// Turn around.
-		set_motors(40,-40);
+		set_motors(45,-45);
 		delay_ms(time*2);
 		break;
 	case 'S':
 		// Don't do anything!
+//		set_motors(40,40);
+//		delay_ms(20);
 		break;
 	}
 }

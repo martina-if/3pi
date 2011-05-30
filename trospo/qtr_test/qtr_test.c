@@ -47,6 +47,8 @@ char buffer[100];
 int main()
 {
 
+	unsigned int counter; // used as a simple timer
+
 	// start receiving data at 9600 baud.
 	serial_set_baud_rate(9600);
 	serial_receive_ring(buffer, 100);
@@ -67,14 +69,33 @@ int main()
 
 	// then start calibration phase and move the sensors over both
 	// reflectance extremes they will encounter in your application:
-	int i;
-	for (i = 0; i < 250; i++)  // make the calibration take about 5 seconds
+	// We use a value of 2000 for the timeout, which
+	// corresponds to 2000*0.4 us = 0.8 ms on our 20 MHz processor.
+	for(counter = 0; counter < 80; counter++)
 	{
-		qtr_calibrate(QTR_EMITTERS_ON);
-		delay(20);
-	}
+		if(counter < 20 || counter >= 60)
+			set_motors(50,-50);
+		else
+			set_motors(-50,50);
 
-	beep(200);
+		qtr_calibrate(QTR_EMITTERS_ON);
+
+		// Since our counter runs to 80, the total delay will be
+		// 80*20 = 1600 ms.
+		delay_ms(20);
+	}
+	set_motors(0,0);
+	play(">>a32");
+
+//	// then start calibration phase and move the sensors over both
+//	// reflectance extremes they will encounter in your application:
+//	int i;
+//	for (i = 0; i < 250; i++)  // make the calibration take about 5 seconds
+//	{
+//		qtr_calibrate(QTR_EMITTERS_ON);
+//		delay(20);
+//	}
+
 	serial_send_blocking("Press Button A to start reading...\n", 35);
 	wait_for_button_press(BUTTON_A);
 

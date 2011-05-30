@@ -89,15 +89,15 @@ int main()
 		// FIRST MAIN LOOP BODY  
 		op = follow_segment();
 
-		if (op == STOP)
-		{
-			set_motors(0,0);
-			goto stop;
-		}
-		else if (op == LEFT || op == RIGHT || op == FORWARD)
-		{
+//		if (op == STOP)
+//		{
+//			set_motors(0,0);
+//			goto stop;
+//		}
+//		else if (op == LEFT || op == RIGHT || op == FORWARD)
+//		{
 			follow_til_interesection(op);
-		}
+//		}
 
 		// Drive straight a bit.  This helps us in case we entered the
 		// intersection at an angle.
@@ -108,7 +108,7 @@ int main()
 
 	}
 
-stop:
+//stop:
 
 	set_motors(0,0);
 	serial_send_blocking("STOP\n", 5);

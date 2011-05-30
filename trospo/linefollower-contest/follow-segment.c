@@ -27,14 +27,50 @@
 // three directions, applying the "left hand on the wall" strategy.
 char select_turn(int* tips, unsigned int tam, unsigned char found_left, unsigned char found_straight, unsigned char found_right)
 {
-	int dir = FORWARD;
+	int i, dir = 0;
+	unsigned int count_l = 0;
+	unsigned int count_r = 0;
 
-	if (tam < 2)
-		dir = tips[0]; // The only one that I found
-	else if (tam < 3)
-		dir = tips[1]; // The center one
-	else
-		dir = tips[2]; // Don't know how much tips I found but follow the third, which should be correct.
+	if (tam < 4)
+		return 'S';
+		
+	for (i = 0; i < tam; i++)
+	{
+		if (tips[i] == FORWARD)
+		{
+			dir = FORWARD;
+			break;
+		}
+		else if (tips[i] == LEFT)
+			count_l ++;
+		else if (tips[i] == RIGHT)
+			count_r ++;
+	}
+
+	if (dir != FORWARD)
+	{
+		if (count_r >= count_l)
+			dir = RIGHT;
+		else if (count_l > count_r)
+			dir = LEFT;
+	}
+
+//	if (tam < 2)
+//	{
+//		dir = tips[0]; // The only one that I found
+//		serial_send_blocking("1 -> ", 5);
+//	}
+//	else if (tam < 3)
+//	{
+//		dir = tips[1]; // The center one
+//		serial_send_blocking("2 -> ", 5);
+//	}
+//	else
+//	{
+//		dir = tips[2]; // Don't know how much tips I found but follow the third, which should be correct.
+//		serial_send_blocking("3+ -> ", 6);
+//	}
+
 
 
 	// Make a decision about how to turn.  The following code
@@ -74,13 +110,13 @@ char select_turn(int* tips, unsigned int tam, unsigned char found_left, unsigned
 		if (found_right)
 			return 'R';
 	}
-	return 'B';
+	return 'S';
 }
 
 int follow_segment()
 {
 	unsigned int sensors[8]; // an array to hold sensor values
-	unsigned int slow = 50;
+	unsigned int slow = 60;
 
 #ifdef PID
 	int last_proportional = 0;
@@ -109,9 +145,10 @@ int follow_segment()
 //		}
 
 		// Look for tips
-		if (sensors[3] > 700 && sensors[0]> 700 && (sensors[2] + sensors[1]) < 700)
+//		if (sensors[3] > 700 && sensors[0]> 700 && (sensors[2] + sensors[1]) < 700)
+		if (sensors[3] > 700 && sensors[0]> 300 && ((sensors[1] + sensors[2]) < 600))
 		{
-			if (sensors[7] > 700 && (sensors[5] + sensors[6]) < 700)
+			if (sensors[7] > 300 && ((sensors[5] + sensors[6]) < 600))
 			{
 				//    |
 				// ---|---
@@ -119,8 +156,6 @@ int follow_segment()
 				//    |
 				// Tip found! Drive forward in the next intersection
 				//...
-//				set_motors(60,60);
-				slow = 50;
 				serial_send_blocking("tip forward\n", 12);
 				play("<<c32");
 				while(is_playing());
@@ -134,15 +169,14 @@ int follow_segment()
 				//    |
 				// Tip found! Drive left in the next intersection
 				// ...
-//				set_motors(60,60);
-				slow = 50;
 				serial_send_blocking("tip left\n", 9);
-				play("c32");
+				play("<<c32");
 				while(is_playing());
+				return LEFT;
 			}
-			return LEFT;
 		}
-		else if (sensors[4] > 700 && sensors[7] > 700 && (sensors[5] + sensors[6]) < 700)
+//		else if (sensors[4] > 700 && sensors[7] > 700 && (sensors[5] + sensors[6]) < 900)
+		else if (sensors[4] > 700 && sensors[7] > 300 && ((sensors[5] + sensors[6]) < 600))
 		{
 			//    |
 			// ---|---
@@ -151,10 +185,8 @@ int follow_segment()
 			// Tip found! Drive right in the next intersection
 			//...
 			// Found an intersection.
-//			set_motors(60,60);
-			slow = 50;
 			serial_send_blocking("tip right\n", 10);
-			play("<c32");
+			play("<<c32");
 			while(is_playing());
 			return RIGHT;
 		}
@@ -257,7 +289,7 @@ int follow_segment()
 			set_motors(170 - slow, 0);
 		}
 #endif
-		return CONTINUE;
+//		return CONTINUE;
 
 	}
 
@@ -265,6 +297,8 @@ int follow_segment()
 
 void follow_til_interesection(int op)
 {
+	serial_send_blocking("Til intersection ------\n", 24);
+
 //	unsigned char found_left, found_straight, found_right;
 	unsigned char found_left;
 	unsigned char found_right;
@@ -276,12 +310,13 @@ void follow_til_interesection(int op)
 
 	while (1)
 	{
-		unsigned int position = qtr_read_line(sensors,QTR_EMITTERS_ON);
+		qtr_read(sensors,QTR_EMITTERS_ON);
 
 		// Look for tips
-		if (sensors[3] > 700 && sensors[0]> 700 && (sensors[2] + sensors[1]) < 700)
+//		if (sensors[3] > 700 && sensors[0]> 600 && (sensors[2] + sensors[1]) < 700)
+		if (sensors[0] > 200 && (sensors[1] + sensors[2] < 1000))
 		{
-			if (sensors[7] > 700 && (sensors[5] + sensors[6]) < 700)
+			if (sensors[7] > 200)// && (sensors[5] + sensors[6]) < 600)
 			{
 				//    |
 				// ---|---
@@ -289,13 +324,13 @@ void follow_til_interesection(int op)
 				//    |
 				// Tip found! Drive forward in the next intersection
 				//...
-				serial_send_blocking("tip forward\n", 12);
+				serial_send_blocking("-> tip forward\n", 15);
 				play("<<c32");
 				while(is_playing());
 				tips[pos] = FORWARD;
 				pos ++;
 			}
-			else if (sensors[7] < 300)
+			else if (sensors[7] < 150)
 			{
 				//    |
 				// ---|---
@@ -303,14 +338,17 @@ void follow_til_interesection(int op)
 				//    |
 				// Tip found! Drive left in the next intersection
 				// ...
-				serial_send_blocking("tip left\n", 9);
-				play("c32");
+				serial_send_blocking("-> tip left\n", 12);
+				play("<<c32");
 				while(is_playing());
 				tips[pos] = LEFT;
 				pos ++;
 			}
+			else
+				serial_send_blocking("nada2\n", 6);
 		}
-		else if (sensors[4] > 700 && sensors[7] > 700 && (sensors[5] + sensors[6]) < 700)
+//		else if (sensors[4] > 700 && sensors[7] > 600 && (sensors[5] + sensors[6]) < 700)
+		else if (sensors[7] > 200 && (sensors[5] + sensors[6]) < 600)
 		{
 			//    |
 			// ---|---
@@ -320,44 +358,52 @@ void follow_til_interesection(int op)
 			//...
 			// Found an intersection.
 //			set_motors(60,60);
-			serial_send_blocking("tip right\n", 10);
-			play("<c32");
+			serial_send_blocking("-> tip right\n", 13);
+			play("<<c32");
 			while(is_playing());
 			tips[pos] = RIGHT;
 			pos ++;
 		}
 
-		if (sensors[1] + sensors[2] > 1200 || sensors[5] + sensors[6] > 1200)
+		if ((sensors[1] > 900 && sensors[2] > 900 && sensors[0] > 900)  || (sensors[5] > 900 && sensors[6] > 900 && sensors[7] > 900))
+		{
+			serial_send("\t---\n", 5);
+			play("<a16");
+			while(is_playing());
 			break; // Found an intersection
+		}
 
-		else if (sensors[3] > 700 && sensors[4] > 700)
+		if (sensors[3] > 750 && sensors[4] > 750)
 		{
-			set_motors(70,70);
+			set_motors(40,40);
 		}
-		else if (sensors[2] > 600 || sensors[1] > 600)
+		else if (sensors[2] > 200)
 		{
-			set_motors(40, 70);
+			set_motors(33, 40);
 		}
-		else if (sensors[0] > 700)
+		else if (sensors[2] > 600)
 		{
-			set_motors(0, 70);
+			set_motors(20, 40);
 		}
-		else if (sensors[5] > 600 || sensors[6] > 600)
+		else if (sensors[5] > 200)
 		{
-			set_motors(70, 40);
+			set_motors(40, 33);
 		}
-		else if (sensors[7] > 700)
+		else if (sensors[5] > 600)
 		{
-			// We are somewhat close to being centered on the line:
-			// drive straight.
-			set_motors(70, 0);
+			set_motors(40, 20);
+		}
+		else
+		{
+			serial_send_blocking("DEFAULT!\n", 9);
+			set_motors(40,40);
 		}
 	}
 
 	// Check for left and right exits.
-	if(sensors[0] > 200)
+	if(sensors[0] > 400)
 		found_left = 1;
-	if(sensors[7] > 200)
+	if(sensors[7] > 400)
 		found_right = 1;
 
 	// Drive straight a bit more - this is enough to line up our
@@ -367,18 +413,23 @@ void follow_til_interesection(int op)
 
 	// Check for a straight exit.
 	qtr_read_line(sensors, QTR_EMITTERS_ON);
-	if(sensors[2] > 200 || sensors[3] > 200 || sensors[4] > 200 || sensors[5])
+	if(sensors[2] > 400 || sensors[3] > 400 || sensors[4] > 400 || sensors[5] > 400)
 		found_straight = 1;
 
 
 	// Intersection identification is complete.
 	// If the maze has been solved, we can follow the existing
 	// path.  Otherwise, we need to learn the solution.
-	unsigned char dir = select_turn(tips, pos, found_left, found_straight, found_right);
+	char dir = select_turn(tips, pos, found_left, found_straight, found_right);
+	serial_send_blocking(&dir, 1);
+	serial_send_blocking("\n", 1);
 
 	// Make the turn indicated by the path.
 	turn(dir, 90);
+	set_motors(50,50); // DEBUG
+//	delay_ms(00);
 
+	serial_send_blocking("End intersection ------\n", 24);
 
 }
 
