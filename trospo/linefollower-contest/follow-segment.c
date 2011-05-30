@@ -395,27 +395,32 @@ void follow_til_interesection(int op)
 //		if (sensors[3] > 500 && sensors[4] > 500)
 		if (sensors[3] + sensors[4] > 1600)
 		{
+			serial_send_blocking("^\n", 2);
 			set_motors(40,40);
 		}
-		else if (sensors[2] > 80)
+		else if (sensors[2] > 180)
 		{
+			serial_send_blocking("<\n", 2);
 			set_motors(33, 40);
 		}
 		else if (sensors[2] > 500)// || sensors[1] > 300)
 		{
+			serial_send_blocking("<\n", 2);
 			set_motors(20, 40);
 		}
-		else if (sensors[5] > 80)
+		else if (sensors[5] > 180)
 		{
+			serial_send_blocking(">\n", 2);
 			set_motors(40, 33);
 		}
 		else if (sensors[5] > 500)// || sensors[6] > 300)
 		{
+			serial_send_blocking(">\n", 2);
 			set_motors(40, 20);
 		}
 		else
 		{
-			send_int(sensors);
+			serial_send_blocking("~\n", 2);
 //			serial_send_blocking("DEFAULT!\n", 9);
 			set_motors(40,40);
 		}
