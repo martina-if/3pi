@@ -100,6 +100,7 @@ void initialize()
 int main()
 {
 	unsigned int sensors[8]; // an array to hold sensor values
+	unsigned int slow = 60;
 
 #ifdef DEBUG
 	unsigned int counter = 0;
@@ -115,7 +116,9 @@ int main()
 		// the "sensors" argument to read_line() here, even though we
 		// are not interested in the individual sensor readings.
 		unsigned int position = qtr_read_line(sensors,QTR_EMITTERS_ON);
+		position = position - 50;
 		
+		/*
 		// If I lift the robot, it should stop the motors. When the 
 		// sensors are no longer near a surface, they will all read 1000,
 		// and the position given by read_line functions will be 3500.
@@ -200,6 +203,54 @@ int main()
 		else
 			counter++;
 #endif
+		*/
+
+		if(position < 1000)
+		{
+			// We are far to the right of the line: turn left.
+
+			// Set the right motor to 100 and the left motor to zero,
+			// to do a sharp turn to the left.  Note that the maximum
+			// value of either motor speed is 255, so we are driving
+			// it at just about 40% of the max.
+			set_motors(0, 180 - slow);
+
+		}
+		else if(position < 2000)
+		{
+			set_motors(40 - slow, 150 - slow);
+		}
+		else if (position < 3000)
+		{
+			set_motors(90 - slow, 150 - slow);
+		}
+		else if (position < 3300) // CENTER = 3500
+		{
+			set_motors(130 - slow, 150 - slow);
+		}
+		else if (position < 3700)
+		{
+			// We are somewhat close to being centered on the line:
+			// drive straight.
+			set_motors(160 - slow, 160 - slow);
+		}
+		else if (position < 4000)
+		{
+			set_motors(150 - slow, 130 - slow);
+		}
+		else if (position < 5000)
+		{
+			set_motors(150 - slow, 90 - slow);
+		}
+		else if (position < 6000)
+		{
+			set_motors(150 - slow, 40 - slow);
+		}
+		else // (position < 7000)
+		{
+			// We are far to the left of the line: turn right.
+			set_motors(180 - slow, 0);
+		}
 
 	}
 

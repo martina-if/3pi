@@ -21,6 +21,7 @@
 #include "follow-segment.h"
 #include "turn.h"
 //#define PID
+#define DEBUG
 
 void send_int(unsigned int* i)
 {
@@ -135,7 +136,7 @@ char select_turn(int* tips, unsigned int tam, unsigned char found_left, unsigned
 int follow_segment()
 {
 	unsigned int sensors[8]; // an array to hold sensor values
-	unsigned int slow = 60;
+	unsigned int slow = 50;
 
 #ifdef PID
 	int last_proportional = 0;
@@ -165,6 +166,9 @@ int follow_segment()
 
 		// Look for tips
 //		if (sensors[3] > 700 && sensors[0]> 700 && (sensors[2] + sensors[1]) < 700)
+		if (sensors[0] > 800 || sensors[7] > 800)
+			set_motors(40,40);
+
 		if (sensors[3] > 700 && sensors[0]> 300 && ((sensors[1] + sensors[2]) < 600))
 		{
 			if (sensors[7] > 300 && ((sensors[5] + sensors[6]) < 600))
@@ -175,7 +179,9 @@ int follow_segment()
 				//    |
 				// Tip found! Drive forward in the next intersection
 				//...
+#ifdef DEBUG
 				serial_send_blocking("tip forward\n", 12);
+#endif
 				play("<<c32");
 				while(is_playing());
 				return FORWARD;
@@ -188,7 +194,9 @@ int follow_segment()
 				//    |
 				// Tip found! Drive left in the next intersection
 				// ...
+#ifdef DEBUG
 				serial_send_blocking("tip left\n", 9);
+#endif
 				play("<<c32");
 				while(is_playing());
 				return LEFT;
@@ -204,7 +212,9 @@ int follow_segment()
 			// Tip found! Drive right in the next intersection
 			//...
 			// Found an intersection.
+#ifdef DEBUG
 			serial_send_blocking("tip right\n", 10);
+#endif
 			play("<<c32");
 			while(is_playing());
 			return RIGHT;
@@ -316,7 +326,9 @@ int follow_segment()
 
 void follow_til_interesection(int op)
 {
+#ifdef DEBUG
 	serial_send_blocking("Til intersection ------\n", 24);
+#endif
 
 //	unsigned char found_left, found_straight, found_right;
 	unsigned char found_left;
@@ -344,7 +356,9 @@ void follow_til_interesection(int op)
 				//    |
 				// Tip found! Drive forward in the next intersection
 				//...
+#ifdef DEBUG
 				serial_send_blocking("-> tip forward\n", 15);
+#endif
 				play("<<c32");
 				while(is_playing());
 				tips[pos] = FORWARD;
@@ -358,7 +372,9 @@ void follow_til_interesection(int op)
 				//    |
 				// Tip found! Drive left in the next intersection
 				// ...
+#ifdef DEBUG
 				serial_send_blocking("-> tip left\n", 12);
+#endif
 				play("<<c32");
 				while(is_playing());
 				tips[pos] = LEFT;
@@ -376,7 +392,9 @@ void follow_til_interesection(int op)
 			//...
 			// Found an intersection.
 //			set_motors(60,60);
+#ifdef DEBUG
 			serial_send_blocking("-> tip right\n", 13);
+#endif
 			play("<<c32");
 			while(is_playing());
 			tips[pos] = RIGHT;
@@ -385,13 +403,26 @@ void follow_til_interesection(int op)
 
 		if ((sensors[1] > 900 && sensors[2] > 900 && sensors[0] > 900)  || (sensors[5] > 900 && sensors[6] > 900 && sensors[7] > 900))
 		{
+#ifdef DEBUG
 			serial_send("\t---\n", 5);
+#endif
 			play("<a16");
 			while(is_playing());
 			break; // Found an intersection
 		}
 
+#ifdef DEBUG
 		send_int(sensors);
+#endif
+		if (sensors[3] > (sensors[4] + 100))
+			set_motors(32,40);
+		else if(sensors[4] > (sensors[3] + 100))
+			set_motors(40,32);
+		else
+			set_motors(40,40);
+		
+			
+		/*
 //		if (sensors[3] > 500 && sensors[4] > 500)
 		if (sensors[3] + sensors[4] > 1600)
 		{
@@ -424,6 +455,7 @@ void follow_til_interesection(int op)
 //			serial_send_blocking("DEFAULT!\n", 9);
 			set_motors(40,40);
 		}
+		*/
 	}
 
 	// Check for left and right exits.
@@ -447,15 +479,19 @@ void follow_til_interesection(int op)
 	// If the maze has been solved, we can follow the existing
 	// path.  Otherwise, we need to learn the solution.
 	char dir = select_turn(tips, pos, found_left, found_straight, found_right);
+#ifdef DEBUG
 	serial_send_blocking(&dir, 1);
 	serial_send_blocking("\n", 1);
+#endif
 
 	// Make the turn indicated by the path.
 	turn(dir, 90);
 	set_motors(50,50); // DEBUG
 //	delay_ms(00);
 
+#ifdef DEBUG
 	serial_send_blocking("End intersection ------\n", 24);
+#endif
 
 }
 
