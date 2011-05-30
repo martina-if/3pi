@@ -21,7 +21,7 @@
 #include "follow-segment.h"
 #include "turn.h"
 //#define PID
-#define DEBUG
+//#define DEBUG
 
 void send_int(unsigned int* i)
 {
@@ -415,11 +415,11 @@ void follow_til_interesection(int op)
 		send_int(sensors);
 #endif
 		if (sensors[3] > (sensors[4] + 100))
-			set_motors(32,40);
+			set_motors(42,50);
 		else if(sensors[4] > (sensors[3] + 100))
-			set_motors(40,32);
+			set_motors(50,42);
 		else
-			set_motors(40,40);
+			set_motors(50,50);
 		
 			
 		/*
