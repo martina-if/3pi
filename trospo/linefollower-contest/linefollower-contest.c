@@ -69,8 +69,8 @@ void initialize()
 	wait_for_button_release(BUTTON_A);
 
 	// Play music and wait for it to finish before we start driving.
-	play_from_program_space(go);
-	while(is_playing());
+//	play_from_program_space(go);
+//	while(is_playing());
 }
 
 

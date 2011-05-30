@@ -17,9 +17,21 @@
 
 
 #include <pololu/orangutan.h>
+#include <stdio.h>
 #include "follow-segment.h"
 #include "turn.h"
 //#define PID
+
+void send_int(unsigned int* i)
+{
+	char buffer[100];
+
+	sprintf(buffer, "%04d %04d %04d %04d %04d %04d %04d %04d\n", i[0], i[1], i[2], 
+			i[3], i[4], i[5], i[6], i[7]);
+
+	serial_send_blocking(buffer, 40);
+}
+
 
 // This function decides which way to turn during the learning phase of
 // maze solving.  It uses the variables found_left, found_straight, and
@@ -310,13 +322,14 @@ void follow_til_interesection(int op)
 
 	while (1)
 	{
-		qtr_read(sensors,QTR_EMITTERS_ON);
+		qtr_read_line(sensors,QTR_EMITTERS_ON);
+//		send_int(sensors);
 
 		// Look for tips
 //		if (sensors[3] > 700 && sensors[0]> 600 && (sensors[2] + sensors[1]) < 700)
-		if (sensors[0] > 200 && (sensors[1] + sensors[2] < 1000))
+		if (sensors[0] > 200 && ((sensors[1] + sensors[2]) < 600))
 		{
-			if (sensors[7] > 200)// && (sensors[5] + sensors[6]) < 600)
+			if (sensors[7] > 200 && ((sensors[5] + sensors[6]) < 600))
 			{
 				//    |
 				// ---|---
@@ -348,7 +361,7 @@ void follow_til_interesection(int op)
 				serial_send_blocking("nada2\n", 6);
 		}
 //		else if (sensors[4] > 700 && sensors[7] > 600 && (sensors[5] + sensors[6]) < 700)
-		else if (sensors[7] > 200 && (sensors[5] + sensors[6]) < 600)
+		else if (sensors[7] > 200 && ((sensors[5] + sensors[6]) < 600))
 		{
 			//    |
 			// ---|---
