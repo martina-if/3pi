@@ -88,6 +88,13 @@ char select_turn(int* tips, unsigned int tam, unsigned char found_left, unsigned
 	// Make a decision about how to turn.  The following code
 	// implements a left-hand-on-the-wall strategy, where we always
 	// turn as far to the left as possible.
+	if (dir == RIGHT && found_right)
+		return 'R';
+	else if (dir == LEFT && found_left)
+		return 'L';
+	else
+		return 'S';
+	/*
 	if (dir == LEFT)
 	{
 		if(found_left)
@@ -122,7 +129,7 @@ char select_turn(int* tips, unsigned int tam, unsigned char found_left, unsigned
 		if (found_right)
 			return 'R';
 	}
-	return 'S';
+	return 'S';*/
 }
 
 int follow_segment()
@@ -357,8 +364,6 @@ void follow_til_interesection(int op)
 				tips[pos] = LEFT;
 				pos ++;
 			}
-			else
-				serial_send_blocking("nada2\n", 6);
 		}
 //		else if (sensors[4] > 700 && sensors[7] > 600 && (sensors[5] + sensors[6]) < 700)
 		else if (sensors[7] > 200 && ((sensors[5] + sensors[6]) < 600))
@@ -386,29 +391,32 @@ void follow_til_interesection(int op)
 			break; // Found an intersection
 		}
 
-		if (sensors[3] > 750 && sensors[4] > 750)
+		send_int(sensors);
+//		if (sensors[3] > 500 && sensors[4] > 500)
+		if (sensors[3] + sensors[4] > 1600)
 		{
 			set_motors(40,40);
 		}
-		else if (sensors[2] > 200)
+		else if (sensors[2] > 80)
 		{
 			set_motors(33, 40);
 		}
-		else if (sensors[2] > 600)
+		else if (sensors[2] > 500)// || sensors[1] > 300)
 		{
 			set_motors(20, 40);
 		}
-		else if (sensors[5] > 200)
+		else if (sensors[5] > 80)
 		{
 			set_motors(40, 33);
 		}
-		else if (sensors[5] > 600)
+		else if (sensors[5] > 500)// || sensors[6] > 300)
 		{
 			set_motors(40, 20);
 		}
 		else
 		{
-			serial_send_blocking("DEFAULT!\n", 9);
+			send_int(sensors);
+//			serial_send_blocking("DEFAULT!\n", 9);
 			set_motors(40,40);
 		}
 	}
