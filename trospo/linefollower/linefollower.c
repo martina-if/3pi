@@ -100,7 +100,7 @@ void initialize()
 int main()
 {
 	unsigned int sensors[8]; // an array to hold sensor values
-	unsigned int slow = 60;
+	unsigned int slow = 30;
 
 #ifdef DEBUG
 	unsigned int counter = 0;

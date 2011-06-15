@@ -136,7 +136,7 @@ char select_turn(int* tips, unsigned int tam, unsigned char found_left, unsigned
 int follow_segment()
 {
 	unsigned int sensors[8]; // an array to hold sensor values
-	unsigned int slow = 50;
+	unsigned int slow = 60;
 
 #ifdef PID
 	int last_proportional = 0;
